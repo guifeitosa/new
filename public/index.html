@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload de Fatura</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Enviar Fatura do Cartão</h1>
+    <p>Escolha o arquivo da fatura e envie para ver o valor a pagar no mês.</p>
+
+    <form id="invoice-form">
+      <label for="invoice-file">Anexo da fatura</label>
+      <input id="invoice-file" name="invoice" type="file" accept=".pdf,.txt,.csv,image/*" required />
+      <button type="submit">Enviar</button>
+    </form>
+
+    <div id="status" class="status"></div>
+    <div id="result" class="result"></div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
