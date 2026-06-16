@@ -2,12 +2,24 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const PDFParse = require('pdf-parse');
 
 const app = express();
 const upload = multer({ dest: path.join(__dirname, 'uploads/') });
 const port = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+async function extractTextFromPDF(filePath) {
+  try {
+    const dataBuffer = await fs.promises.readFile(filePath);
+    const data = await PDFParse(dataBuffer);
+    return data.text;
+  } catch (error) {
+    console.error('Erro ao extrair texto do PDF:', error.message);
+    return '';
+  }
+}
 
 app.post('/upload', upload.single('invoice'), async (req, res) => {
   if (!req.file) {
@@ -20,12 +32,16 @@ app.post('/upload', upload.single('invoice'), async (req, res) => {
     let amount = null;
     let content = '';
 
-    if (ext === '.txt' || ext === '.csv' || req.file.mimetype.startsWith('text/')) {
+    if (ext === '.pdf' || req.file.mimetype === 'application/pdf') {
+      content = await extractTextFromPDF(filePath);
+      console.log('Texto extraído do PDF:');
+      console.log(content);
+      console.log('---');
+    } else if (ext === '.txt' || ext === '.csv' || req.file.mimetype.startsWith('text/')) {
       content = await fs.promises.readFile(filePath, 'utf8');
     } else {
-      // Para PDF, imagem, ou outro formato, retornamos uma mensagem
       return res.status(400).json({ 
-        error: 'Por favor, envie um arquivo TXT com o conteúdo da fatura. Você pode copiar e colar o texto do PDF no Bloco de Notas.' 
+        error: 'Formato não suportado. Envie PDF ou TXT.' 
       });
     }
 
